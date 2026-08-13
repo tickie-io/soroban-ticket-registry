@@ -1,0 +1,9 @@
+{
+  "name": "Tickie Demo Event #42",
+  "description": "Sample event metadata referenced by the ticket-registry testnet demo. In production this document is served by the Tickie platform CDN; no personal data ever appears here or on-chain.",
+  "organizer": "Tickie (demo)",
+  "venue": "Demo Arena, Paris",
+  "start": "2026-09-12T18:30:00Z",
+  "end": "2026-09-12T22:00:00Z",
+  "website": "https://www.tickie.io/en"
+}

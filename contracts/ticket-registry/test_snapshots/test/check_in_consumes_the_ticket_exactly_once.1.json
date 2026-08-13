@@ -28,7 +28,7 @@
                   "u32": 10000
                 },
                 {
-                  "string": "https://cdn.tickie.io/events/42.json"
+                  "string": "https://raw.githubusercontent.com/tickie-io/soroban-ticket-registry/main/examples/metadata/42.json"
                 }
               ]
             }
@@ -192,7 +192,7 @@
                       "symbol": "metadata_uri"
                     },
                     "val": {
-                      "string": "https://cdn.tickie.io/events/42.json"
+                      "string": "https://raw.githubusercontent.com/tickie-io/soroban-ticket-registry/main/examples/metadata/42.json"
                     }
                   },
                   {

@@ -28,7 +28,10 @@ fn create_default_event(env: &Env, client: &TicketRegistryClient) -> Address {
         &organizer,
         &500,    // 5% royalty on resale
         &10_000, // resale capped at face value
-        &String::from_str(env, "https://cdn.tickie.io/events/42.json"),
+        &String::from_str(
+            env,
+            "https://raw.githubusercontent.com/tickie-io/soroban-ticket-registry/main/examples/metadata/42.json",
+        ),
     );
     organizer
 }
