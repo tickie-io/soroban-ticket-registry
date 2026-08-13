@@ -40,11 +40,11 @@ Every ticket sold through Tickie is registered as a unique on-chain record:
 
 Privacy by construction: **no personal data on-chain**. Ticket ids are SHA-256 hashes of internal references; holders appear only as Stellar addresses (GDPR-compatible).
 
-## Live on testnet
+## Live on testnet — source-verified
 
-The Phase 1 contract is deployed and exercised on Stellar testnet:
+The Phase 1 contract is deployed and exercised on Stellar testnet, built reproducibly from a [GitHub release](https://github.com/tickie-io/soroban-ticket-registry/releases) and **source-verified on StellarExpert** (the on-chain Wasm hash matches this repository):
 
-- Contract: [`CDAWMGYRZIY6ZUEDH4NNPAE4URHBSHUOWNAE55R73HDRLZWOQ57BQVFP`](https://stellar.expert/explorer/testnet/contract/CDAWMGYRZIY6ZUEDH4NNPAE4URHBSHUOWNAE55R73HDRLZWOQ57BQVFP)
+- Contract: [`CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO`](https://stellar.expert/explorer/testnet/contract/CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO)
 - Verified end-to-end on-chain: `create_event` → `mint_ticket` → `get_ticket`/`is_valid` → `check_in`, including the two failure paths that matter for fraud resistance (duplicate mint rejected with `TicketAlreadyExists`, second gate check-in rejected with `TicketNotValid`).
 
 ## Getting started
