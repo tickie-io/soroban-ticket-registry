@@ -1,0 +1,5 @@
+target/
+.stellar/
+*.wasm
+.env
+.DS_Store

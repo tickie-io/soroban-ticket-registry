@@ -1,0 +1,28 @@
+[workspace]
+resolver = "2"
+members = ["contracts/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/tickie-io/soroban-ticket-registry"
+authors = ["Tickie <contact@tickie.io>"]
+
+[workspace.dependencies]
+soroban-sdk = "27.0.6"
+
+# Settings recommended by the Soroban docs for small, deterministic Wasm builds.
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
