@@ -19,7 +19,7 @@ jobs:
     with:
       release_name: ${{ github.ref_name }}
       release_description: "Tickie ticket-registry contract release"
-      relative_path: '["contracts/ticket-registry"]'
+      relative_path: "contracts/ticket-registry"
       package: "ticket-registry"
     secrets:
       release_token: ${{ secrets.GITHUB_TOKEN }}
