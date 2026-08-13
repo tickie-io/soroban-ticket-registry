@@ -40,6 +40,13 @@ Every ticket sold through Tickie is registered as a unique on-chain record:
 
 Privacy by construction: **no personal data on-chain**. Ticket ids are SHA-256 hashes of internal references; holders appear only as Stellar addresses (GDPR-compatible).
 
+## Live on testnet
+
+The Phase 1 contract is deployed and exercised on Stellar testnet:
+
+- Contract: [`CBUVEOKA5YI3JQRJ2HRNULK63FVXKGWUWHWRCBXJ353YHNJFLG3ZDXYG`](https://stellar.expert/explorer/testnet/contract/CBUVEOKA5YI3JQRJ2HRNULK63FVXKGWUWHWRCBXJ353YHNJFLG3ZDXYG)
+- Verified end-to-end on-chain: `create_event` → `mint_ticket` → `get_ticket`/`is_valid` → `check_in`, including the two failure paths that matter for fraud resistance (duplicate mint rejected with `TicketAlreadyExists`, second gate check-in rejected with `TicketNotValid`).
+
 ## Getting started
 
 Prerequisites: [Rust](https://www.rust-lang.org/tools/install) (stable) and the [Stellar CLI](https://developers.stellar.org/docs/tools/cli/install-cli).
