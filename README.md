@@ -44,7 +44,7 @@ Privacy by construction: **no personal data on-chain**. Ticket ids are SHA-256 h
 
 The Phase 1 contract is deployed and exercised on Stellar testnet:
 
-- Contract: [`CBUVEOKA5YI3JQRJ2HRNULK63FVXKGWUWHWRCBXJ353YHNJFLG3ZDXYG`](https://stellar.expert/explorer/testnet/contract/CBUVEOKA5YI3JQRJ2HRNULK63FVXKGWUWHWRCBXJ353YHNJFLG3ZDXYG)
+- Contract: [`CDAWMGYRZIY6ZUEDH4NNPAE4URHBSHUOWNAE55R73HDRLZWOQ57BQVFP`](https://stellar.expert/explorer/testnet/contract/CDAWMGYRZIY6ZUEDH4NNPAE4URHBSHUOWNAE55R73HDRLZWOQ57BQVFP)
 - Verified end-to-end on-chain: `create_event` → `mint_ticket` → `get_ticket`/`is_valid` → `check_in`, including the two failure paths that matter for fraud resistance (duplicate mint rejected with `TicketAlreadyExists`, second gate check-in rejected with `TicketNotValid`).
 
 ## Getting started
