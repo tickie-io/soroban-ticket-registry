@@ -11,19 +11,19 @@ Tickie operates a production SaaS platform (ticketing, CRM, seating, access cont
 ```mermaid
 flowchart LR
     subgraph Existing["Tickie platform (production today)"]
-        FO[Ticketing storefronts] --> BE[NestJS backend]
-        AC[Access-control apps] --> BE
-        ORG[Organizer dashboard] --> BE
-        BE --> DB[(PostgreSQL)]
-        BE --> Q[[BullMQ outbox queue]]
+        FO["Ticketing storefronts"] --> BE["NestJS backend"]
+        AC["Access-control apps"] --> BE
+        ORG["Organizer dashboard"] --> BE
+        BE --> DB[("PostgreSQL")]
+        BE --> Q[["BullMQ outbox queue"]]
     end
-    subgraph Stellar["Stellar layer (this project)"]
-        Q --> RPC[Stellar RPC]
-        RPC --> TR[Ticket Registry contract]
-        RPC --> MP[Marketplace contract - Phase 2]
-        MP --> USDC[Stellar Asset Contract - USDC]
-        ANCHOR[Anchor Platform - EUR on/off ramp] --> USDC
-        WK[Stellar Wallets Kit + Passkey Kit] --> MP
+    subgraph StellarLayer["Stellar layer (this project)"]
+        Q --> RPC["Stellar RPC"]
+        RPC --> TR["Ticket Registry contract"]
+        RPC --> MP["Marketplace contract - Phase 2"]
+        MP --> USDC["Stellar Asset Contract - USDC"]
+        ANCHOR["Anchor Platform - EUR on-off ramp"] --> USDC
+        WK["Stellar Wallets Kit + Passkey Kit"] --> MP
     end
 ```
 
@@ -50,6 +50,8 @@ flowchart LR
 ## 4. Contract interfaces
 
 ### 4.1 Ticket Registry (Phase 1 — implemented in this repo)
+
+Status: **implemented, tested (13 unit tests, CI) and live on testnet**, source-verified on StellarExpert — contract [`CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO`](https://stellar.expert/explorer/testnet/contract/CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO), full lifecycle (mint → transfer → check-in, plus duplicate-mint and double-check-in rejections) exercised on-chain.
 
 Storage model:
 
@@ -111,6 +113,8 @@ fn set_fee(fee_bps: u32)                                  // admin
 
 The royalty split is **atomic**: seller proceeds, organizer royalty and platform fee move in the same Soroban transaction as the ownership transfer. There is no escrow state to reconcile and no partial-failure window.
 
+Design note: royalty distribution is deliberately *not* a separate contract. Splitting it out (a "royalty contract" called after settlement) would reintroduce exactly the partial-failure window the atomic design eliminates; instead the split is a leg of `buy` itself, reading the policy anchored in the registry's `EventInfo`.
+
 ### 4.3 Settlement (Phase 3)
 
 - Organizer payouts: USDC → EUR via Anchor Platform (SEP-24/SEP-31 flows), replacing multi-day card-rail payouts.
@@ -125,18 +129,18 @@ Ticket purchase (primary sale):
 sequenceDiagram
     participant Buyer
     participant BE as Tickie backend
-    participant Q as Outbox (BullMQ)
+    participant Q as Outbox queue
     participant RPC as Stellar RPC
     participant TR as Ticket Registry
 
     Buyer->>BE: purchase (card or USDC)
-    BE->>BE: create ticket in PostgreSQL (source of truth for identity)
+    BE->>BE: create ticket in PostgreSQL (system of record)
     BE-->>Buyer: ticket delivered immediately (QR + wallet link)
     BE->>Q: enqueue on-chain registration (idempotent job)
-    Q->>RPC: submit mint_ticket(sha256(ref), ...)
+    Q->>RPC: submit mint_ticket with sha256 ticket id
     RPC->>TR: transaction
-    TR-->>RPC: mint event
-    RPC-->>BE: event ingested, ticket marked "on-chain"
+    TR-->>RPC: TicketMinted event
+    RPC-->>BE: event ingested, ticket marked on-chain
 ```
 
 Gate check-in follows the same pattern: the access-control device validates against the backend cache instantly, and the `check_in` transaction confirms on-chain within ~5 seconds; any mismatch surfaces in reconciliation before the ticket can be reused.
