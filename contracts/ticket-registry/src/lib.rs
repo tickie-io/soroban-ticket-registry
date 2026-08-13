@@ -4,11 +4,11 @@
 //! [Tickie](https://www.tickie.io) platform. Every ticket sold via Tickie is
 //! registered here as a unique on-chain record, providing:
 //!
-//! - **Verifiable ownership** — each ticket is bound to a Stellar address.
-//! - **Duplicate-proof issuance** — a ticket id can only ever be minted once.
-//! - **Fraud-resistant entry validation** — check-in is atomic and final, so a
+//! - **Verifiable ownership**: each ticket is bound to a Stellar address.
+//! - **Duplicate-proof issuance**: a ticket id can only ever be minted once.
+//! - **Fraud-resistant entry validation**: check-in is atomic and final, so a
 //!   ticket cannot pass the gate twice.
-//! - **Resale policy anchoring** — every event carries the organizer royalty
+//! - **Resale policy anchoring**: every event carries the organizer royalty
 //!   rate and resale price cap enforced by the (Phase 2) marketplace contract.
 //!
 //! This is Phase 1 of the Tickie × Stellar integration:
@@ -29,9 +29,9 @@ use soroban_sdk::{
 
 /// Ledgers per day, assuming ~5s ledger close time.
 const DAY_IN_LEDGERS: u32 = 17_280;
-/// Rent: extend entries to ~120 days whenever they are touched…
+/// Rent: extend entries to ~120 days whenever they are touched,
 const EXTEND_TO_LEDGERS: u32 = 120 * DAY_IN_LEDGERS;
-/// …but only if fewer than ~30 days of TTL remain.
+/// but only if fewer than ~30 days of TTL remain.
 const TTL_THRESHOLD_LEDGERS: u32 = 30 * DAY_IN_LEDGERS;
 
 /// 100% expressed in basis points.

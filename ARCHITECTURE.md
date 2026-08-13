@@ -31,9 +31,9 @@ flowchart LR
 
 | Phase | Months | Deliverable |
 |---|---|---|
-| 1 — Ticket Registry | M1–M2 | `ticket-registry` contract (this repo), backend integration, duplicate-proof issuance, atomic check-in |
-| 2 — Marketplace | M3–M4 | `marketplace` contract: compliant resale, atomic royalty splits in USDC, per-event resale policy enforcement |
-| 3 — Settlement & onboarding | M5–M6 | Anchor Platform integration (EUR↔USDC), Passkey Kit wallet onboarding, mainnet rollout to first organizers |
+| 1. Ticket Registry | M1–M2 | `ticket-registry` contract (this repo), backend integration, duplicate-proof issuance, atomic check-in |
+| 2. Marketplace | M3–M4 | `marketplace` contract: compliant resale, atomic royalty splits in USDC, per-event resale policy enforcement |
+| 3. Settlement & onboarding | M5–M6 | Anchor Platform integration (EUR↔USDC), Passkey Kit wallet onboarding, mainnet rollout to first organizers |
 
 ## 3. Stellar components used (SCF Integration List)
 
@@ -42,16 +42,16 @@ flowchart LR
 | **Soroban** | The two custom contracts (`ticket-registry`, `marketplace`) |
 | **Stellar RPC** | Transaction submission + event ingestion (registry/marketplace events indexed back into PostgreSQL) |
 | **Stellar Asset Contract (USDC)** | Settlement leg of resales and payouts |
-| **Anchor Platform** | Fiat EUR ↔ USDC on/off ramp for international sales and organizer payouts. Primary anchor candidate: **Mykobo** (EU-regulated, EURC/SEP-24); integration conversations planned during Phase 2 — the Anchor Platform keeps the design anchor-agnostic |
+| **Anchor Platform** | Fiat EUR ↔ USDC on/off ramp for international sales and organizer payouts. Primary anchor candidate: **Mykobo** (EU-regulated, EURC/SEP-24); integration conversations planned during Phase 2; the Anchor Platform keeps the design anchor-agnostic |
 | **Stellar Wallets Kit** | Wallet connection for crypto-native buyers on the resale market |
 | **Passkey Kit** | Face ID / Touch ID smart-wallet onboarding for mainstream buyers (no seed phrase, ever) |
 | **Launchtube** | Fee-sponsored transaction submission so buyers never need to hold XLM |
 
 ## 4. Contract interfaces
 
-### 4.1 Ticket Registry (Phase 1 — implemented in this repo)
+### 4.1 Ticket Registry (Phase 1, implemented in this repo)
 
-Status: **implemented, tested (13 unit tests, CI) and live on testnet**, source-verified on StellarExpert — contract [`CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO`](https://stellar.expert/explorer/testnet/contract/CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO), full lifecycle (mint → transfer → check-in, plus duplicate-mint and double-check-in rejections) exercised on-chain.
+Status: **implemented, tested (13 unit tests, CI) and live on testnet**, source-verified on StellarExpert: contract [`CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO`](https://stellar.expert/explorer/testnet/contract/CBHK6M5PHUS7MAAMUWDC6V3E6BSX2OU65QKVMH5OVE4DJ4AGO57SPWMO), full lifecycle (mint → transfer → check-in, plus duplicate-mint and double-check-in rejections) exercised on-chain.
 
 Storage model:
 
@@ -94,11 +94,11 @@ Entry points:
 
 Design notes:
 
-- `ticket_id = SHA-256(internal Tickie ticket reference)` — deterministic, collision-proof, idempotent registration, and **no personal data on-chain** (GDPR-safe: holders are Stellar addresses, everything nominative stays in the existing PostgreSQL, which remains the system of record for identity).
+- `ticket_id = SHA-256(internal Tickie ticket reference)`: deterministic, collision-proof, idempotent registration, and **no personal data on-chain** (GDPR-safe: holders are Stellar addresses, everything nominative stays in the existing PostgreSQL, which remains the system of record for identity).
 - Contract events (`event`, `mint`, `transfer`, `checkin`, `revoke`) are ingested via Stellar RPC into the backend for reporting and reconciliation.
 - Persistent entries get their TTL extended (~120 days) on every touch; a background job re-bumps long-lived inventory.
 
-### 4.2 Marketplace (Phase 2 — interface design)
+### 4.2 Marketplace (Phase 2, interface design)
 
 ```rust
 // All amounts settle in USDC via the Stellar Asset Contract.
@@ -106,8 +106,8 @@ fn list(ticket_id: BytesN<32>, price: i128)              // owner auth; price <=
 fn delist(ticket_id: BytesN<32>)                          // seller auth
 fn buy(ticket_id: BytesN<32>, buyer: Address)             // buyer auth; atomic settlement:
     // 1. verify listing + resale policy (cap, window) from the registry
-    // 2. USDC transfer buyer -> {seller, organizer royalty, platform fee} — one transaction
-    // 3. registry.transfer(ticket_id, buyer) — same transaction
+    // 2. USDC transfer buyer -> {seller, organizer royalty, platform fee} in one transaction
+    // 3. registry.transfer(ticket_id, buyer) in the same transaction
 fn set_fee(fee_bps: u32)                                  // admin
 ```
 
@@ -150,20 +150,20 @@ Gate check-in follows the same pattern: the access-control device validates agai
 | Failure | Behavior |
 |---|---|
 | Stellar RPC unavailable during a sale | Sales are **never blocked**: tickets are issued off-chain first; on-chain registration is an idempotent outbox job that retries with backoff until confirmed |
-| Duplicate registration attempt (job retry, race) | Rejected by the contract (`TicketAlreadyExists`) — the outbox treats it as success (idempotence) |
+| Duplicate registration attempt (job retry, race) | Rejected by the contract (`TicketAlreadyExists`); the outbox treats it as success (idempotence) |
 | Transaction fee spike / surge pricing | Fee-bump via Launchtube; jobs are re-submitted with adjusted resources |
 | Backend ↔ chain divergence | Nightly reconciliation job diffs PostgreSQL against RPC-ingested contract events; divergences are alerted, never silently corrected |
-| Gate offline (venue connectivity) | Devices hold a signed local snapshot; check-ins are queued and settled on-chain when connectivity returns — double-entry attempts are caught by the atomic `check_in` |
+| Gate offline (venue connectivity) | Devices hold a signed local snapshot; check-ins are queued and settled on-chain when connectivity returns; double-entry attempts are caught by the atomic `check_in` |
 
 ## 7. Compliance
 
-- **French resale law**: ticket resale in France is regulated (unauthorized for-profit resale is prohibited — Code pénal art. 313-6-2). The marketplace contract makes the organizer's resale policy (price cap, transfer window) *structurally enforceable on-chain*, which is stronger than the off-chain moderation used by incumbents. This turns a legal constraint into a product feature.
+- **French resale law**: ticket resale in France is regulated (unauthorized for-profit resale is prohibited, Code pénal art. 313-6-2). The marketplace contract makes the organizer's resale policy (price cap, transfer window) *structurally enforceable on-chain*, which is stronger than the off-chain moderation used by incumbents. This turns a legal constraint into a product feature.
 - **ControlTick**: Tickie is ControlTick-certified (French ticketing compliance label); the on-chain registry strengthens the auditability this label requires.
 - **GDPR**: no personal data on-chain (see §4.1). Right-to-erasure applies to the off-chain PostgreSQL record; the on-chain hash is not linkable to a person without it.
 - **Funds flow**: fiat flows are handled by the regulated anchor (KYC at the ramp), not by Tickie contracts.
 
 ## 8. Security posture
 
-- Contracts kept deliberately small and auditable; no upgradeability magic — admin key rotation via `set_admin`, contract upgrades via standard Wasm upgrade with a timelocked admin (Phase 2).
+- Contracts kept deliberately small and auditable; no upgradeability magic: admin key rotation via `set_admin`, contract upgrades via standard Wasm upgrade with a timelocked admin (Phase 2).
 - `overflow-checks = true` in release; all state transitions are explicit finite-state (Valid → CheckedIn | Revoked, terminal).
 - Audit planned through the Stellar LaunchKit audit credits at the testnet tranche (per SCF Build framework).
