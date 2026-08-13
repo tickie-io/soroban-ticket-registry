@@ -21,7 +21,7 @@ Stellar is the only chain where the unit economics of per-resale royalty splits 
 
 | Phase | Contract / component | Status |
 |---|---|---|
-| 1 | **Ticket Registry** (`contracts/ticket-registry`) — duplicate-proof on-chain ticket issuance, ownership, transfer and atomic gate check-in | ✅ In development (this repo) |
+| 1 | **Ticket Registry** (`contracts/ticket-registry`) — duplicate-proof on-chain ticket issuance, ownership, transfer and atomic gate check-in | ✅ Live on testnet, source-verified |
 | 2 | **Marketplace** — compliant peer-to-peer resale with **atomic royalty splits** to organizers, enforcing per-event price caps and transfer windows | 🔜 Planned |
 | 3 | **USDC settlement** — cross-border payments and organizer payouts via the [Anchor Platform](https://developers.stellar.org/docs/anchoring-assets), [Stellar Wallets Kit](https://stellarwalletskit.dev/) and [Passkey Kit](https://github.com/kalepail/passkey-kit) onboarding | 🔜 Planned |
 
