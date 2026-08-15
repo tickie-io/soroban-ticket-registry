@@ -12,7 +12,7 @@ On-chain ticket ownership, compliant resale and USDC settlement for the live eve
 Event ticketing has three structural problems that off-chain databases cannot solve:
 
 1. **Fraud**: duplicated and counterfeit tickets are only detected at the gate, when it is too late.
-2. **Grey-market resale**: French organizers alone lose an estimated €6.5M per event night to unregulated resale, with zero value returning to the rightsholder.
+2. **Grey-market resale**: an estimated 20-30% of French show tickets leak to unauthorized resale channels, a black market estimated at over €130M per year (Prodiss), with zero value returning to the rightsholder.
 3. **Cross-border settlement**: card rails cost ~3% plus multi-day payout delays, which makes per-resale royalty distribution economically impossible.
 
 Stellar is the only chain where the unit economics of per-resale royalty splits close: sub-cent fees and ~5-second finality across thousands of micro-settlements per event.
